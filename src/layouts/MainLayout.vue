@@ -21,10 +21,25 @@
             icon="minimize"
             @mouseover="isHovering = true"
             @mouseleave="isHovering = false"
+            @click="minimizeWindow"
           />
 
-          <q-btn class="titlebar-button" dense flat round icon="crop_square" />
-          <q-btn class="titlebar-button close" dense flat round icon="close" />
+          <q-btn
+            class="titlebar-button"
+            dense
+            flat
+            round
+            icon="crop_square"
+            @click="maximizeWindow"
+          />
+          <q-btn
+            class="titlebar-button close"
+            dense
+            flat
+            round
+            icon="close"
+            @click="closeWindow"
+          />
         </div>
       </q-toolbar>
     </q-header>
@@ -110,6 +125,18 @@ import { ref } from 'vue';
 defineOptions({
   name: 'MainLayout',
 });
+
+function minimizeWindow() {
+  window.api.minimizeWindow();
+}
+
+function maximizeWindow() {
+  window.api.maximizeWindow();
+}
+
+function closeWindow() {
+  window.api.closeWindow();
+}
 
 const isHovering = ref(false);
 </script>
