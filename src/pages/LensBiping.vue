@@ -30,7 +30,7 @@
             <q-card-section>
               <div class="text-h6">Carregar planilha</div>
 
-              <q-form @submit="onSubmit">
+              <q-form @submit="onSubmit($event)">
                 <q-file
                   v-model="selectedFile"
                   type="file"
@@ -79,6 +79,8 @@
 <script lang="ts">
 import { QTableProps } from 'quasar';
 import { ref } from 'vue';
+
+import ExcelService from 'src/utils/excelService';
 
 const columns: QTableProps['columns'] = [
   {
@@ -227,8 +229,21 @@ export default {
     return {
       uploadFileDialog: ref(false),
       selectedFile,
-      onSubmit() {
-        console.log(selectedFile.value);
+      async onSubmit(evt: Event | SubmitEvent) {
+        evt.preventDefault();
+
+        if (selectedFile.value) {
+          try {
+            const jsonData = await ExcelService.readExcelFile(
+              selectedFile.value
+            );
+            console.log('jsonData: ', jsonData);
+          } catch (error) {
+            console.log('Erro ao processar o arquivo Excel: ', error);
+          }
+        } else {
+          console.log('Arquivo não selecionado');
+        }
       },
       visibleColumns: ref([
         'calories',
