@@ -118,15 +118,15 @@ const columns = ref<QTableProps['columns']>(
   }))
 );
 
-console.log('Columns:', columns.value);
-
 export default {
   setup() {
     const selectedFile = ref<File | null>(null);
 
     watch(tableData, async (newData) => {
-      if (newData && newData['Base de Dados']) {
-        const columnsFromExcel = Object.keys(newData['Base de Dados'][0]);
+      if (newData && newData[Object.keys(newData)[0]]) {
+        const columnsFromExcel = Object.keys(
+          newData[Object.keys(newData)[0]][0]
+        );
 
         columns.value!.splice(0, columns.value!.length);
 
@@ -143,7 +143,7 @@ export default {
         });
         visibleColumns.value = [...columnsFromExcel];
 
-        rows.value = newData['Base de Dados'];
+        rows.value = newData[Object.keys(newData)[0]];
       }
     });
 
@@ -156,7 +156,8 @@ export default {
         if (selectedFile.value) {
           try {
             const jsonData = await ExcelService.readExcelFile(
-              selectedFile.value
+              selectedFile.value,
+              'Base de Dados'
             );
 
             tableData.value = jsonData;
