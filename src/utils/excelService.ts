@@ -1,8 +1,15 @@
 import * as XLSX from 'xlsx';
 
+function filterDataBase(str: string): boolean {
+  const normalize: string = str.toLowerCase().replace(/[_ ]+/g, ' ').trim();
+
+  return normalize === 'base dados' || normalize === 'base de dados';
+}
+
 export default class ExcelService {
   static async readExcelFile(
-    file: File
+    file: File,
+    returnOnlyThisSheetName?: string
   ): Promise<{ [sheetname: string]: unknown[] }> {
     const reader = new FileReader();
     const buffer = await new Promise<ArrayBuffer>((resolve, reject) => {
@@ -20,7 +27,15 @@ export default class ExcelService {
 
     const result: { [sheetName: string]: unknown[] } = {};
 
+    let matchSheetName: string | null = null;
+
     workbook.SheetNames.forEach((sheetName: string) => {
+      if (returnOnlyThisSheetName) {
+        if (!filterDataBase(sheetName)) return;
+
+        matchSheetName = sheetName;
+      }
+
       const sheet = workbook.Sheets[sheetName];
       const json: unknown[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
@@ -48,6 +63,8 @@ export default class ExcelService {
       result[sheetName] = json;
     });
 
-    return result;
+    return returnOnlyThisSheetName
+      ? { [matchSheetName!]: result[matchSheetName!] }
+      : result;
   }
 }
